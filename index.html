@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>行字符数检查工具</title>
+    <title>Main & Billing Address 字符数检测</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
             --primary-color: #007bff;
             --error-color: #dc3545;
             --success-color: #28a745;
+            --info-color: #17a2b8;
         }
 
         html {
@@ -80,9 +81,21 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        .result-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
         .result-item {
             padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f5f5f5;
         }
 
         .error {
@@ -94,8 +107,21 @@
             color: var(--success-color);
         }
 
+        .info {
+            color: var(--info-color);
+            font-weight: bold;
+        }
+
         .limit {
             color: #666;
+            font-size: 0.9em;
+        }
+
+        .language-detection {
+            background-color: #f8f9fa;
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
             font-size: 0.9em;
         }
 
@@ -112,26 +138,26 @@
 </head>
 <body>
     <main>
-        <h1>行字符数检查工具</h1>
+        <h1>Main & Billing Address 字符数检测</h1>
 
         <div class="input-group">
-            <label for="line1">第一行内容（≤45字符）</label>
-            <input type="text" id="line1" placeholder="请输入第一行内容">
+            <label for="line1">Line 1</label>
+            <input type="text" id="line1" placeholder="请输入Line 1">
         </div>
 
         <div class="input-group">
-            <label for="line2">第二行内容（≤45字符）</label>
-            <input type="text" id="line2" placeholder="请输入第二行内容">
+            <label for="line2">Line 2</label>
+            <input type="text" id="line2" placeholder="请输入Line 2">
         </div>
 
         <div class="input-group">
-            <label for="line3">第三行内容（≤35字符）</label>
-            <input type="text" id="line3" placeholder="请输入第三行内容">
+            <label for="line3">City</label>
+            <input type="text" id="line3" placeholder="请输入City">
         </div>
 
         <div class="input-group">
-            <label for="line4">第四行内容（≤35字符）</label>
-            <input type="text" id="line4" placeholder="请输入第四行内容">
+            <label for="line4">Province</label>
+            <input type="text" id="line4" placeholder="请输入Province">
         </div>
 
         <button onclick="checkLineLengths()">检查字符数</button>
@@ -140,67 +166,148 @@
     </main>
 
     <script>
+        function isChinese(text) {
+            // 简单的中文检测：如果包含中文字符则认为是中文
+            return /[\u4e00-\u9fa5]/.test(text);
+        }
+
+        function detectLanguage(lines) {
+            // 检测所有行中是否包含中文
+            for (let line of lines) {
+                if (isChinese(line)) {
+                    return 'chinese';
+                }
+            }
+            return 'english';
+        }
+
         function checkLineLengths() {
             const line1 = document.getElementById('line1').value;
             const line2 = document.getElementById('line2').value;
             const line3 = document.getElementById('line3').value;
             const line4 = document.getElementById('line4').value;
-            
+
+            const lines = [line1, line2, line3, line4];
+            const language = detectLanguage(lines);
+
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '';
-            
+
+            // 语言检测结果
+            resultDiv.innerHTML += `
+                <div class="language-detection">
+                    检测到内容语言：<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>
+                </div>
+            `;
+
             // 检查每行字符数
             const line1Length = line1.length;
             const line2Length = line2.length;
             const line3Length = line3.length;
             const line4Length = line4.length;
-            
-            const line1Valid = line1Length <= 45;
-            const line2Valid = line2Length <= 45;
-            const line3Valid = line3Length <= 35;
-            const line4Valid = line4Length <= 35;
-            
+
+            // 中文限制
+            const chineseLimits = [45, 20, 35, 35];
+            const chineseLine1Valid = line1Length <= chineseLimits[0];
+            const chineseLine2Valid = line2Length <= chineseLimits[1];
+            const chineseLine3Valid = line3Length <= chineseLimits[2];
+            const chineseLine4Valid = line4Length <= chineseLimits[3];
+
+            // 英文限制
+            const englishLimits = [45, 45, 35, 35];
+            const englishLine1Valid = line1Length <= englishLimits[0];
+            const englishLine2Valid = line2Length <= englishLimits[1];
+            const englishLine3Valid = line3Length <= englishLimits[2];
+            const englishLine4Valid = line4Length <= englishLimits[3];
+
             // 创建结果HTML
-            let html = '<h3>检查结果：</h3>';
-            
-            // 第一行结果
-            html += `<div class="result-item">
-                <span>第一行：${line1Length}字符</span>
-                <span class="limit">(限制≤45字符)</span>
-                <span class="${line1Valid ? 'success' : 'error'}">${line1Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
-            </div>`;
-            
-            // 第二行结果
-            html += `<div class="result-item">
-                <span>第二行：${line2Length}字符</span>
-                <span class="limit">(限制≤45字符)</span>
-                <span class="${line2Valid ? 'success' : 'error'}">${line2Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
-            </div>`;
-            
-            // 第三行结果
-            html += `<div class="result-item">
-                <span>第三行：${line3Length}字符</span>
-                <span class="limit">(限制≤35字符)</span>
-                <span class="${line3Valid ? 'success' : 'error'}">${line3Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
-            </div>`;
-            
-            // 第四行结果
-            html += `<div class="result-item">
-                <span>第四行：${line4Length}字符</span>
-                <span class="limit">(限制≤35字符)</span>
-                <span class="${line4Valid ? 'success' : 'error'}">${line4Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
-            </div>`;
-            
-            // 总体检查结果
-            const allValid = line1Valid && line2Valid && line3Valid && line4Valid;
-            html += `<div class="result-item" style="margin-top: 1rem; border-top: 2px solid #eee; padding-top: 1rem;">
-                <span style="font-weight: bold;">总体检查：</span>
-                <span class="${allValid ? 'success' : 'error'}" style="font-size: 1.1em;">
-                    ${allValid ? '✓ 所有行都符合字符数限制' : '✗ 有行不符合字符数限制'}
-                </span>
-            </div>`;
-            
-            resultDiv.innerHTML = html;
+            let html = '';
+
+            // 中文检查结果
+            html += `
+                <div class="result-section">
+                    <div class="result-title">中文检查标准 (≤45, ≤20, ≤35, ≤35)</div>
+                    <div class="result-item">
+                        <span>第一行：${line1Length}字符</span>
+                        <span class="limit">(限制≤${chineseLimits[0]}字符)</span>
+                        <span class="${chineseLine1Valid ? 'success' : 'error'}">${chineseLine1Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>第二行：${line2Length}字符</span>
+                        <span class="limit">(限制≤${chineseLimits[1]}字符)</span>
+                        <span class="${chineseLine2Valid ? 'success' : 'error'}">${chineseLine2Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>城市：${line3Length}字符</span>
+                        <span class="limit">(限制≤${chineseLimits[2]}字符)</span>
+                        <span class="${chineseLine3Valid ? 'success' : 'error'}">${chineseLine3Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>省份：${line4Length}字符</span>
+                        <span class="limit">(限制≤${chineseLimits[3]}字符)</span>
+                        <span class="${chineseLine4Valid ? 'success' : 'error'}">${chineseLine4Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
+                        <span style="font-weight: bold;">中文标准总体：</span>
+                        <span class="${chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid ? 'success' : 'error'}">
+                            ${chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid ? '✓ 全部符合' : '✗ 部分不符合'}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            // 英文检查结果
+            html += `
+                <div class="result-section">
+                    <div class="result-title">英文检查标准 (≤45, ≤45, ≤35, ≤35)</div>
+                    <div class="result-item">
+                        <span>第一行：${line1Length}字符</span>
+                        <span class="limit">(限制≤${englishLimits[0]}字符)</span>
+                        <span class="${englishLine1Valid ? 'success' : 'error'}">${englishLine1Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>第二行：${line2Length}字符</span>
+                        <span class="limit">(限制≤${englishLimits[1]}字符)</span>
+                        <span class="${englishLine2Valid ? 'success' : 'error'}">${englishLine2Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>城市：${line3Length}字符</span>
+                        <span class="limit">(限制≤${englishLimits[2]}字符)</span>
+                        <span class="${englishLine3Valid ? 'success' : 'error'}">${englishLine3Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span>省份：${line4Length}字符</span>
+                        <span class="limit">(限制≤${englishLimits[3]}字符)</span>
+                        <span class="${englishLine4Valid ? 'success' : 'error'}">${englishLine4Valid ? '✓ 符合' : '✗ 超出'}</span>
+                    </div>
+                    <div class="result-item" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
+                        <span style="font-weight: bold;">英文标准总体：</span>
+                        <span class="${englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid ? 'success' : 'error'}">
+                            ${englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid ? '✓ 全部符合' : '✗ 部分不符合'}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            // 最终建议
+            const recommendedValid = language === 'chinese' ?
+                (chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid) :
+                (englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid);
+
+            html += `
+                <div class="result-section" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid #eee;">
+                    <div class="result-title">最终检查结果</div>
+                    <div class="result-item">
+                        根据内容语言(<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>)，
+                        推荐使用<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>标准检查：
+                        <span class="${recommendedValid ? 'success' : 'error'}" style="font-weight: bold;">
+                            ${recommendedValid ? '✓ 符合要求' : '✗ 不符合要求'}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            resultDiv.innerHTML += html;
         }
     </script>
 </body>
