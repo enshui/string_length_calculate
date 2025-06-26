@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>行字符数检查工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+        }
+
+        html {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        body {
+            margin: 0 auto;
+            padding: 2rem;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            height: 20px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin: 1.5rem 0;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .result-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-weight: bold;
+        }
+
+        .success {
+            color: var(--success-color);
+        }
+
+        .limit {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>行字符数检查工具</h1>
+
+        <div class="input-group">
+            <label for="line1">第一行内容（≤45字符）</label>
+            <input type="text" id="line1" placeholder="请输入第一行内容">
+        </div>
+
+        <div class="input-group">
+            <label for="line2">第二行内容（≤45字符）</label>
+            <input type="text" id="line2" placeholder="请输入第二行内容">
+        </div>
+
+        <div class="input-group">
+            <label for="line3">第三行内容（≤35字符）</label>
+            <input type="text" id="line3" placeholder="请输入第三行内容">
+        </div>
+
+        <div class="input-group">
+            <label for="line4">第四行内容（≤35字符）</label>
+            <input type="text" id="line4" placeholder="请输入第四行内容">
+        </div>
+
+        <button onclick="checkLineLengths()">检查字符数</button>
+
+        <div id="result"></div>
+    </main>
+
+    <script>
+        function checkLineLengths() {
+            const line1 = document.getElementById('line1').value;
+            const line2 = document.getElementById('line2').value;
+            const line3 = document.getElementById('line3').value;
+            const line4 = document.getElementById('line4').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            
+            // 检查每行字符数
+            const line1Length = line1.length;
+            const line2Length = line2.length;
+            const line3Length = line3.length;
+            const line4Length = line4.length;
+            
+            const line1Valid = line1Length <= 45;
+            const line2Valid = line2Length <= 45;
+            const line3Valid = line3Length <= 35;
+            const line4Valid = line4Length <= 35;
+            
+            // 创建结果HTML
+            let html = '<h3>检查结果：</h3>';
+            
+            // 第一行结果
+            html += `<div class="result-item">
+                <span>第一行：${line1Length}字符</span>
+                <span class="limit">(限制≤45字符)</span>
+                <span class="${line1Valid ? 'success' : 'error'}">${line1Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
+            </div>`;
+            
+            // 第二行结果
+            html += `<div class="result-item">
+                <span>第二行：${line2Length}字符</span>
+                <span class="limit">(限制≤45字符)</span>
+                <span class="${line2Valid ? 'success' : 'error'}">${line2Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
+            </div>`;
+            
+            // 第三行结果
+            html += `<div class="result-item">
+                <span>第三行：${line3Length}字符</span>
+                <span class="limit">(限制≤35字符)</span>
+                <span class="${line3Valid ? 'success' : 'error'}">${line3Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
+            </div>`;
+            
+            // 第四行结果
+            html += `<div class="result-item">
+                <span>第四行：${line4Length}字符</span>
+                <span class="limit">(限制≤35字符)</span>
+                <span class="${line4Valid ? 'success' : 'error'}">${line4Valid ? '✓ 符合要求' : '✗ 超出限制'}</span>
+            </div>`;
+            
+            // 总体检查结果
+            const allValid = line1Valid && line2Valid && line3Valid && line4Valid;
+            html += `<div class="result-item" style="margin-top: 1rem; border-top: 2px solid #eee; padding-top: 1rem;">
+                <span style="font-weight: bold;">总体检查：</span>
+                <span class="${allValid ? 'success' : 'error'}" style="font-size: 1.1em;">
+                    ${allValid ? '✓ 所有行都符合字符数限制' : '✗ 有行不符合字符数限制'}
+                </span>
+            </div>`;
+            
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
