@@ -10,6 +10,8 @@
             --error-color: #dc3545;
             --success-color: #28a745;
             --info-color: #17a2b8;
+            --chinese-bg: #f8f9fa;
+            --english-bg: #f0f8ff;
         }
 
         html {
@@ -21,13 +23,52 @@
         body {
             margin: 0 auto;
             padding: 2rem;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 2rem;
+        }
+
+        .input-columns {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-column {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .chinese-input {
+            background-color: var(--chinese-bg);
+            border: 1px solid #d1e7ff;
+        }
+
+        .english-input {
+            background-color: var(--english-bg);
+            border: 1px solid #d4edda;
+        }
+
+        .column-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid;
+        }
+
+        .chinese-title {
+            border-color: var(--primary-color);
+        }
+
+        .english-title {
+            border-color: var(--success-color);
         }
 
         .input-group {
@@ -123,14 +164,6 @@
             font-size: 0.9em;
         }
 
-        .language-detection {
-            background-color: #f8f9fa;
-            padding: 0.8rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9em;
-        }
-
         .final-result {
             margin-top: 1.5rem;
             padding-top: 1rem;
@@ -138,7 +171,7 @@
         }
 
         @media (max-width: 768px) {
-            .result-columns {
+            .input-columns, .result-columns {
                 flex-direction: column;
             }
 
@@ -156,143 +189,155 @@
     <main>
         <h1>Main & Billing Address 字符数检测</h1>
 
-        <div class="input-group">
-            <label for="line1">Line 1</label>
-            <input type="text" id="line1" placeholder="请输入Line 1地址">
+        <div class="input-columns">
+            <div class="input-column chinese-input">
+                <div class="column-title chinese-title">中文地址</div>
+                <div class="input-group">
+                    <label for="line1-cn">Line 1</label>
+                    <input type="text" id="line1-cn" placeholder="Enter Line 1 address">
+                </div>
+                <div class="input-group">
+                    <label for="line2-cn">Line 2</label>
+                    <input type="text" id="line2-cn" placeholder="Enter Line 2 address">
+                </div>
+                <div class="input-group">
+                    <label for="city-cn">City</label>
+                    <input type="text" id="city-cn" placeholder="Enter city">
+                </div>
+                <div class="input-group">
+                    <label for="province-cn">Province</label>
+                    <input type="text" id="province-cn" placeholder="Enter province">
+                </div>
+            </div>
+
+            <div class="input-column english-input">
+                <div class="column-title english-title">English Address</div>
+                <div class="input-group">
+                    <label for="line1-en">Line 1</label>
+                    <input type="text" id="line1-en" placeholder="Enter Line 1 address">
+                </div>
+                <div class="input-group">
+                    <label for="line2-en">Line 2</label>
+                    <input type="text" id="line2-en" placeholder="Enter Line 2 address">
+                </div>
+                <div class="input-group">
+                    <label for="city-en">City</label>
+                    <input type="text" id="city-en" placeholder="Enter city">
+                </div>
+                <div class="input-group">
+                    <label for="province-en">Province</label>
+                    <input type="text" id="province-en" placeholder="Enter province">
+                </div>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="line2">Line 2</label>
-            <input type="text" id="line2" placeholder="请输入Line 2地址">
-        </div>
-
-        <div class="input-group">
-            <label for="line3">City</label>
-            <input type="text" id="line3" placeholder="请输入City">
-        </div>
-
-        <div class="input-group">
-            <label for="line4">Province</label>
-            <input type="text" id="line4" placeholder="请输入Province">
-        </div>
-
-        <button onclick="checkLineLengths()">检查字符数</button>
+        <button onclick="checkLineLengths()">Check Character Limits</button>
 
         <div id="result"></div>
     </main>
 
     <script>
-        function isChinese(text) {
-            return /[\u4e00-\u9fa5]/.test(text);
-        }
-
-        function detectLanguage(lines) {
-            for (let line of lines) {
-                if (isChinese(line)) {
-                    return 'chinese';
-                }
-            }
-            return 'english';
-        }
-
         function checkLineLengths() {
-            const line1 = document.getElementById('line1').value;
-            const line2 = document.getElementById('line2').value;
-            const line3 = document.getElementById('line3').value;
-            const line4 = document.getElementById('line4').value;
+            // 中文输入
+            const line1CN = document.getElementById('line1-cn').value;
+            const line2CN = document.getElementById('line2-cn').value;
+            const cityCN = document.getElementById('city-cn').value;
+            const provinceCN = document.getElementById('province-cn').value;
 
-            const lines = [line1, line2, line3, line4];
-            const language = detectLanguage(lines);
+            // 英文输入
+            const line1EN = document.getElementById('line1-en').value;
+            const line2EN = document.getElementById('line2-en').value;
+            const cityEN = document.getElementById('city-en').value;
+            const provinceEN = document.getElementById('province-en').value;
 
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '';
 
-            // 语言检测结果
-            resultDiv.innerHTML += `
-                <div class="language-detection">
-                    检测到内容语言：<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>
-                </div>
-            `;
+            // 检查中文输入的字符数
+            const line1CNLength = line1CN.length;
+            const line2CNLength = line2CN.length;
+            const cityCNLength = cityCN.length;
+            const provinceCNLength = provinceCN.length;
 
-            // 检查每行字符数
-            const line1Length = line1.length;
-            const line2Length = line2.length;
-            const line3Length = line3.length;
-            const line4Length = line4.length;
+            // 检查英文输入的字符数
+            const line1ENLength = line1EN.length;
+            const line2ENLength = line2EN.length;
+            const cityENLength = cityEN.length;
+            const provinceENLength = provinceEN.length;
 
             // 中文限制
             const chineseLimits = [45, 20, 35, 35];
-            const chineseLine1Valid = line1Length <= chineseLimits[0];
-            const chineseLine2Valid = line2Length <= chineseLimits[1];
-            const chineseLine3Valid = line3Length <= chineseLimits[2];
-            const chineseLine4Valid = line4Length <= chineseLimits[3];
+            const chineseLine1Valid = line1CNLength <= chineseLimits[0];
+            const chineseLine2Valid = line2CNLength <= chineseLimits[1];
+            const chineseCityValid = cityCNLength <= chineseLimits[2];
+            const chineseProvinceValid = provinceCNLength <= chineseLimits[3];
 
             // 英文限制
             const englishLimits = [45, 45, 35, 35];
-            const englishLine1Valid = line1Length <= englishLimits[0];
-            const englishLine2Valid = line2Length <= englishLimits[1];
-            const englishLine3Valid = line3Length <= englishLimits[2];
-            const englishLine4Valid = line4Length <= englishLimits[3];
+            const englishLine1Valid = line1ENLength <= englishLimits[0];
+            const englishLine2Valid = line2ENLength <= englishLimits[1];
+            const englishCityValid = cityENLength <= englishLimits[2];
+            const englishProvinceValid = provinceENLength <= englishLimits[3];
 
             // 创建结果HTML - 并排显示
             let html = `
                 <div class="result-columns">
                     <div class="result-column">
-                        <div class="result-title">中文检查标准 (≤45, ≤20, ≤35, ≤35)</div>
+                        <div class="result-title">中文标准(≤45, ≤20, ≤35, ≤35)</div>
                         <div class="result-item">
-                            <span>第一行：${line1Length}字符</span>
+                            <span>Line 1：${line1CNLength}字符</span>
                             <span class="limit">(限制≤${chineseLimits[0]})</span>
                             <span class="${chineseLine1Valid ? 'success' : 'error'}">${chineseLine1Valid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>第二行：${line2Length}字符</span>
+                            <span>Line 2：${line2CNLength}字符</span>
                             <span class="limit">(限制≤${chineseLimits[1]})</span>
                             <span class="${chineseLine2Valid ? 'success' : 'error'}">${chineseLine2Valid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>城市：${line3Length}字符</span>
+                            <span>City：${cityCNLength}字符</span>
                             <span class="limit">(限制≤${chineseLimits[2]})</span>
-                            <span class="${chineseLine3Valid ? 'success' : 'error'}">${chineseLine3Valid ? '✓ 符合' : '✗ 超出'}</span>
+                            <span class="${chineseCityValid ? 'success' : 'error'}">${chineseCityValid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>省份：${line4Length}字符</span>
+                            <span>Province：${provinceCNLength}字符</span>
                             <span class="limit">(限制≤${chineseLimits[3]})</span>
-                            <span class="${chineseLine4Valid ? 'success' : 'error'}">${chineseLine4Valid ? '✓ 符合' : '✗ 超出'}</span>
+                            <span class="${chineseProvinceValid ? 'success' : 'error'}">${chineseProvinceValid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
                             <span style="font-weight: bold;">中文标准总体：</span>
-                            <span class="${chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid ? 'success' : 'error'}">
-                                ${chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid ? '✓ 全部符合' : '✗ 部分不符合'}
+                            <span class="${chineseLine1Valid && chineseLine2Valid && chineseCityValid && chineseProvinceValid ? 'success' : 'error'}">
+                                ${chineseLine1Valid && chineseLine2Valid && chineseCityValid && chineseProvinceValid ? '✓ 全部符合' : '✗ 部分不符合'}
                             </span>
                         </div>
                     </div>
 
                     <div class="result-column">
-                        <div class="result-title">英文检查标准 (≤45, ≤45, ≤35, ≤35)</div>
+                        <div class="result-title">英文标准(≤45, ≤45, ≤35, ≤35)</div>
                         <div class="result-item">
-                            <span>第一行：${line1Length}字符</span>
+                            <span>Line 1：${line1ENLength}字符</span>
                             <span class="limit">(限制≤${englishLimits[0]})</span>
                             <span class="${englishLine1Valid ? 'success' : 'error'}">${englishLine1Valid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>第二行：${line2Length}字符</span>
+                            <span>Line 2：${line2ENLength}字符</span>
                             <span class="limit">(限制≤${englishLimits[1]})</span>
                             <span class="${englishLine2Valid ? 'success' : 'error'}">${englishLine2Valid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>城市：${line3Length}字符</span>
+                            <span>City：${cityENLength}字符</span>
                             <span class="limit">(限制≤${englishLimits[2]})</span>
-                            <span class="${englishLine3Valid ? 'success' : 'error'}">${englishLine3Valid ? '✓ 符合' : '✗ 超出'}</span>
+                            <span class="${englishCityValid ? 'success' : 'error'}">${englishCityValid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item">
-                            <span>省份：${line4Length}字符</span>
+                            <span>Province：${provinceENLength}字符</span>
                             <span class="limit">(限制≤${englishLimits[3]})</span>
-                            <span class="${englishLine4Valid ? 'success' : 'error'}">${englishLine4Valid ? '✓ 符合' : '✗ 超出'}</span>
+                            <span class="${englishProvinceValid ? 'success' : 'error'}">${englishProvinceValid ? '✓ 符合' : '✗ 超出'}</span>
                         </div>
                         <div class="result-item" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #eee;">
                             <span style="font-weight: bold;">英文标准总体：</span>
-                            <span class="${englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid ? 'success' : 'error'}">
-                                ${englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid ? '✓ 全部符合' : '✗ 部分不符合'}
+                            <span class="${englishLine1Valid && englishLine2Valid && englishCityValid && englishProvinceValid ? 'success' : 'error'}">
+                                ${englishLine1Valid && englishLine2Valid && englishCityValid && englishProvinceValid ? '✓ 全部符合' : '✗ 部分不符合'}
                             </span>
                         </div>
                     </div>
@@ -300,24 +345,28 @@
             `;
 
             // 最终建议
-            const recommendedValid = language === 'chinese' ?
-                (chineseLine1Valid && chineseLine2Valid && chineseLine3Valid && chineseLine4Valid) :
-                (englishLine1Valid && englishLine2Valid && englishLine3Valid && englishLine4Valid);
+            const chineseAllValid = chineseLine1Valid && chineseLine2Valid && chineseCityValid && chineseProvinceValid;
+            const englishAllValid = englishLine1Valid && englishLine2Valid && englishCityValid && englishProvinceValid;
 
             html += `
                 <div class="final-result">
                     <div class="result-title">最终检查结果</div>
                     <div class="result-item">
-                        根据内容语言(<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>)，
-                        推荐使用<span class="info">${language === 'chinese' ? '中文' : '英文'}</span>标准检查：
-                        <span class="${recommendedValid ? 'success' : 'error'}" style="font-weight: bold;">
-                            ${recommendedValid ? '✓ 符合要求' : '✗ 不符合要求'}
+                        <span>中文地址：</span>
+                        <span class="${chineseAllValid ? 'success' : 'error'}" style="font-weight: bold;">
+                            ${chineseAllValid ? '✓ 符合要求' : '✗ 不符合要求'}
+                        </span>
+                    </div>
+                    <div class="result-item">
+                        <span>英文地址：</span>
+                        <span class="${englishAllValid ? 'success' : 'error'}" style="font-weight: bold;">
+                            ${englishAllValid ? '✓ 符合要求' : '✗ 不符合要求'}
                         </span>
                     </div>
                 </div>
             `;
 
-            resultDiv.innerHTML += html;
+            resultDiv.innerHTML = html;
         }
     </script>
 </body>
